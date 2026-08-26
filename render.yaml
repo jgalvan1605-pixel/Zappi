@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: zappi-saas
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npx prisma db push --accept-data-loss && npx tsx scripts/seed-elena-carrera.ts && npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: zappi-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPTION_SECRET
+        value: zappi_secret_aes_encryption_key_2026_32char
+      - key: TELEGRAM_BOT_TOKEN
+        value: "8757846990:AAFzswDxQmT9faJvFPFn2h-eS8g2fDIRVt8"
+      - key: TELEGRAM_COMMERCIAL_CHAT_ID
+        value: "1034043897"
+
+databases:
+  - name: zappi-db
+    plan: free
+    region: frankfurt
+    databaseName: zappi
+    user: zappi_user

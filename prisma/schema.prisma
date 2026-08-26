@@ -1,0 +1,151 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String         @id @default(uuid())
+  email           String         @unique
+  passwordHash    String
+  name            String
+  role            String         @default("owner") // owner, admin, agent
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([organizationId])
+}
+
+model Organization {
+  id                    String         @id @default(uuid())
+  name                  String
+  plan                  String         @default("free") // "free", "pro", "scale"
+  shopifyWebhookSecret  String?
+  telegramChatId        String?        // ID de chat/grupo de Telegram del equipo comercial
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  monthlyQuota          Int            @default(250)
+  messageCredits        Int            @default(250)
+  messagesSentThisMonth Int            @default(0)
+  wabaId                String?
+  phoneNumberId         String?
+  accessToken           String?
+  users                 User[]
+  contacts              Contact[]
+  campaigns             Campaign[]
+  automations           Automation[]
+  conversations         Conversation[]
+  scheduledJobs         ScheduledJob[]
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+}
+
+model Contact {
+  id              String         @id @default(uuid())
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  phone           String
+  firstName       String?
+  lastName        String?
+  email           String?
+  tags            String[]
+  customFields    Json?
+  optedOut        Boolean        @default(false)
+  optedOutAt      DateTime?
+  messages        Message[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([organizationId, phone])
+  @@index([organizationId])
+  @@index([phone])
+}
+
+model ScheduledJob {
+  id              String         @id @default(uuid())
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  jobType         String
+  targetPhone     String
+  payload         Json
+  status          String         @default("pending")
+  executeAt       DateTime
+  attempts        Int            @default(0)
+  maxAttempts     Int            @default(3)
+  lastError       String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([status, executeAt])
+  @@index([organizationId, targetPhone, status])
+}
+
+model Campaign {
+  id              String         @id @default(uuid())
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name            String
+  templateName    String
+  templateParams  Json?
+  targetAudience  Json?
+  status          String         @default("draft")
+  totalTarget     Int            @default(0)
+  sentCount       Int            @default(0)
+  deliveredCount  Int            @default(0)
+  readCount       Int            @default(0)
+  scheduledAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([organizationId])
+}
+
+model Automation {
+  id              String         @id @default(uuid())
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name            String
+  triggerType     String
+  flowData        Json
+  isActive        Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([organizationId])
+}
+
+model Conversation {
+  id              String         @id @default(uuid())
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contactPhone    String
+  contactName     String?
+  status          String         @default("open")
+  assignedTo      String?
+  messages        Message[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([organizationId])
+}
+
+model Message {
+  id              String         @id @default(uuid())
+  conversationId  String
+  conversation    Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  contactId       String?
+  contact         Contact?       @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  wamid           String?
+  direction       String
+  type            String
+  content         Json
+  status          String         @default("sent")
+  createdAt       DateTime       @default(now())
+
+  @@index([conversationId])
+}
