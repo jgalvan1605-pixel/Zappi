@@ -1,17 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import InboxView from './InboxView';
-import CampaignsView from './CampaignsView';
-import AutomationsView from './AutomationsView';
-import AudiencesView from './AudiencesView';
-import SettingsBillingView from './SettingsBillingView';
-import WhatsAppSettingsModal from './WhatsAppSettingsModal';
-import TelegramSettingsModal from './TelegramSettingsModal';
-import ImportCsvModal from './ImportCsvModal';
-import CreateCampaignModal from './CreateCampaignModal';
-import CreateAutomationModal from './CreateAutomationModal';
-import RoiCalculator from './RoiCalculator';
+import { InboxView } from './InboxView';
+import { CampaignsView } from './CampaignsView';
+import { AutomationsView } from './AutomationsView';
+import { AudiencesView } from './AudiencesView';
+import { SettingsBillingView } from './SettingsBillingView';
+import { WhatsAppSettingsModal } from './WhatsAppSettingsModal';
+import { TelegramSettingsModal } from './TelegramSettingsModal';
+import { ImportCsvModal } from './ImportCsvModal';
+import { CreateCampaignModal } from './CreateCampaignModal';
+import { CreateAutomationModal } from './CreateAutomationModal';
+import { RoiCalculator } from './RoiCalculator';
 
 interface DashboardAppProps {
   initialTab?: string;
@@ -45,7 +45,7 @@ export default function DashboardApp({ initialTab = 'overview' }: DashboardAppPr
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row font-sans antialiased overflow-x-hidden">
-      {/* ================= CABECERA MÓVIL (Solo visible < md) ================= */}
+      {/* ================= CABECERA MÓVIL ================= */}
       <header className="md:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-lg shadow-sm">
@@ -83,11 +83,11 @@ export default function DashboardApp({ initialTab = 'overview' }: DashboardAppPr
       {mobileMenuOpen && (
         <div
           onClick={() => setMobileMenuOpen(false)}
-          className="fixed inset-0 bg-black/70 backdrop-blur-xs z-40 md:hidden animate-fade-in"
+          className="fixed inset-0 bg-black/70 backdrop-blur-xs z-40 md:hidden"
         />
       )}
 
-      {/* ================= SIDEBAR (Drawer en móvil, fijo en desktop) ================= */}
+      {/* ================= SIDEBAR ================= */}
       <aside
         className={`fixed md:static inset-y-0 left-0 z-50 w-72 md:w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0 transform transition-transform duration-300 ease-in-out md:translate-x-0 ${
           mobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
@@ -180,10 +180,8 @@ export default function DashboardApp({ initialTab = 'overview' }: DashboardAppPr
 
       {/* ================= CONTENEDOR PRINCIPAL ================= */}
       <main className="flex-1 w-full min-w-0 bg-slate-950 overflow-y-auto min-h-screen">
-        {/* Vistas */}
         {activeTab === 'overview' && (
           <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6">
-            {/* Header Vista General */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
@@ -212,7 +210,6 @@ export default function DashboardApp({ initialTab = 'overview' }: DashboardAppPr
               </div>
             </div>
 
-            {/* Grid KPIs (1 col en móvil, 2 en tablet, 4 en desktop) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
               <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 relative overflow-hidden">
                 <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
@@ -251,7 +248,6 @@ export default function DashboardApp({ initialTab = 'overview' }: DashboardAppPr
               </div>
             </div>
 
-            {/* Accesos Rápidos */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800 flex flex-col justify-between">
                 <div>
@@ -291,29 +287,46 @@ export default function DashboardApp({ initialTab = 'overview' }: DashboardAppPr
         )}
 
         {activeTab === 'conversations' && <InboxView />}
-        {activeTab === 'campaigns' && (
-          <CampaignsView onCreateCampaign={() => setShowCreateCampaignModal(true)} />
-        )}
-        {activeTab === 'automations' && (
-          <AutomationsView onCreateAutomation={() => setShowCreateAutomationModal(true)} />
-        )}
-        {activeTab === 'audiences' && (
-          <AudiencesView onImportClick={() => setShowImportCsvModal(true)} />
-        )}
+        {activeTab === 'campaigns' && <CampaignsView />}
+        {activeTab === 'automations' && <AutomationsView />}
+        {activeTab === 'audiences' && <AudiencesView />}
         {activeTab === 'billing' && <SettingsBillingView />}
       </main>
 
-      {/* Modales Globales */}
-      {showWhatsAppModal && <WhatsAppSettingsModal onClose={() => setShowWhatsAppModal(false)} />}
-      {showTelegramModal && <TelegramSettingsModal onClose={() => setShowTelegramModal(false)} />}
-      {showImportCsvModal && <ImportCsvModal onClose={() => setShowImportCsvModal(false)} />}
-      {showCreateCampaignModal && (
-        <CreateCampaignModal onClose={() => setShowCreateCampaignModal(false)} />
+      {/* ================= MODALES ================= */}
+      <WhatsAppSettingsModal
+        isOpen={showWhatsAppModal}
+        onClose={() => setShowWhatsAppModal(false)}
+      />
+      <TelegramSettingsModal
+        isOpen={showTelegramModal}
+        onClose={() => setShowTelegramModal(false)}
+      />
+      <ImportCsvModal
+        isOpen={showImportCsvModal}
+        onClose={() => setShowImportCsvModal(false)}
+      />
+      <CreateCampaignModal
+        isOpen={showCreateCampaignModal}
+        onClose={() => setShowCreateCampaignModal(false)}
+      />
+      <CreateAutomationModal
+        isOpen={showCreateAutomationModal}
+        onClose={() => setShowCreateAutomationModal(false)}
+      />
+      {showRoiCalculator && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
+          <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+            <button
+              onClick={() => setShowRoiCalculator(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white text-lg"
+            >
+              ✕
+            </button>
+            <RoiCalculator />
+          </div>
+        </div>
       )}
-      {showCreateAutomationModal && (
-        <CreateAutomationModal onClose={() => setShowCreateAutomationModal(false)} />
-      )}
-      {showRoiCalculator && <RoiCalculator onClose={() => setShowRoiCalculator(false)} />}
     </div>
   );
 }
