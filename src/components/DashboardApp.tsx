@@ -15,9 +15,10 @@ import { RoiCalculator } from './RoiCalculator';
 
 interface DashboardAppProps {
   initialTab?: string;
+  currentUser?: any;
 }
 
-export default function DashboardApp({ initialTab = 'overview' }: DashboardAppProps) {
+export default function DashboardApp({ initialTab = 'overview', currentUser }: DashboardAppProps) {
   const [activeTab, setActiveTab] = useState<string>(initialTab);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
@@ -169,7 +170,9 @@ export default function DashboardApp({ initialTab = 'overview' }: DashboardAppPr
               <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center font-bold text-slate-300 text-[10px]">
                 EC
               </div>
-              <span className="truncate max-w-[120px]">Atelier Elena</span>
+              <span className="truncate max-w-[120px]">
+                {currentUser?.email || 'Atelier Elena'}
+              </span>
             </div>
             <a href="/login" className="hover:text-rose-400 transition" title="Cerrar sesión">
               🚪
@@ -297,22 +300,27 @@ export default function DashboardApp({ initialTab = 'overview' }: DashboardAppPr
       <WhatsAppSettingsModal
         isOpen={showWhatsAppModal}
         onClose={() => setShowWhatsAppModal(false)}
+        onSuccess={() => setShowWhatsAppModal(false)}
       />
       <TelegramSettingsModal
         isOpen={showTelegramModal}
         onClose={() => setShowTelegramModal(false)}
+        onSuccess={() => setShowTelegramModal(false)}
       />
       <ImportCsvModal
         isOpen={showImportCsvModal}
         onClose={() => setShowImportCsvModal(false)}
+        onSuccess={() => setShowImportCsvModal(false)}
       />
       <CreateCampaignModal
         isOpen={showCreateCampaignModal}
         onClose={() => setShowCreateCampaignModal(false)}
+        onSuccess={() => setShowCreateCampaignModal(false)}
       />
       <CreateAutomationModal
         isOpen={showCreateAutomationModal}
         onClose={() => setShowCreateAutomationModal(false)}
+        onSuccess={() => setShowCreateAutomationModal(false)}
       />
       {showRoiCalculator && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
